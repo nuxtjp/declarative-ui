@@ -6,7 +6,7 @@
 
 実装済みの範囲、必要な依存関係、検証コマンドを以下の英語説明に併記しています。操作・配備・公開は、それぞれの権限と設定を確認してから実施してください。
 
-現在の依存設定にはGit対象外のローカル成果物が含まれます。配布経路が整うまでは、cloneだけで依存を導入できません。
+通信と操作契約の依存ライブラリは公式npmレジストリから取得します。UI自体の公開状況と、検証用fixtureのソース配置は以下に記載しています。
 
 ## 使い方
 
@@ -31,7 +31,7 @@ Package distribution is not activated by this documentation. Use the checked-in 
 
 ## Getting started
 
-The manifest currently requires locally supplied package archives: `@crowsi/interaction-transport`, `@zixcel/interaction`. These archives are excluded from Git. Obtain the exact approved dependency artifacts before installing; a fresh clone alone is not sufficient. Registry distribution remains pending.
+The transport and interaction contracts use the published npm versions `@crowsi/interaction-transport@0.10.0` and `@zixcel/interaction@0.10.0`. No private registry or local TGZ is required for these dependencies. This UI package itself has not yet been published; build the source for development and fixture verification.
 
 Use `pnpm@10.29.3` and the Node.js version declared in `engines` in `package.json`. Run from this repository:
 
