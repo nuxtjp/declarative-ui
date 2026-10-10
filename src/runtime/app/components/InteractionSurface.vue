@@ -32,7 +32,7 @@ const { data, refresh } = await useAsyncData(key, async () => {
   const scope = props.scope, request = {method:'read',params:{view:props.view}}
   try {
     const result = typeof window === 'undefined'
-      ? await requestFetch<unknown>(props.endpoint, {method:'POST',body:request})
+      ? await requestFetch<unknown, string, 'post'>(props.endpoint, {method:'post',body:request})
       : await transport.request(request)
     return checkedRead(result, scope)
   } catch (error) { return transportFailure(error) }
