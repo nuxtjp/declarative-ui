@@ -1,0 +1,60 @@
+name: Stage reviewed public UI with OIDC
+on:
+  workflow_dispatch:
+    inputs:
+      expected-source-sha:
+        type: string
+        required: true
+      expected-archive-sha256:
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: npm-publication-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  stage:
+    if: github.ref == 'refs/heads/main' && github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: npm-public
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Require reviewed main source and real OIDC context
+        env:
+          EXPECTED_SHA: ${{ inputs.expected-source-sha }}
+          APPROVED_SHA: ${{ vars.REGISTRY_SECURITY_APPROVED_SHA }}
+        run: |
+          [[ "$EXPECTED_SHA" =~ ^[a-f0-9]{40}$ && "$EXPECTED_SHA" == "$GITHUB_SHA" && "$EXPECTED_SHA" == "$APPROVED_SHA" ]]
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_URL"
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.15.0'
+          package-manager-cache: false
+      - run: npm install --global npm@12.2.0 pnpm@10.29.3 --ignore-scripts
+      - name: Build and validate exact candidate without publishing credentials
+        run: |
+          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm test
+          pnpm typecheck
+          pnpm build
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
+          node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/nuxtjp-declarative-ui-0.10.0.tgz"
+      - name: Bind candidate to owner-reviewed digest and stage using OIDC
+        env:
+          EXPECTED_ARCHIVE: ${{ inputs.expected-archive-sha256 }}
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
+        run: |
+          [[ "$EXPECTED_ARCHIVE" =~ ^[a-f0-9]{64}$ ]]
+          ARCHIVE="$RUNNER_TEMP/nuxtjp-declarative-ui-0.10.0.tgz"
+          printf '%s  %s\n' "$EXPECTED_ARCHIVE" "$ARCHIVE" | sha256sum --check
+          npm stage publish "$ARCHIVE" --access public --provenance --ignore-scripts
+          printf '%s\n' 'Staged only. Owner must approve the exact npm stage with 2FA; this is not a completed registry release.' >> "$GITHUB_STEP_SUMMARY"

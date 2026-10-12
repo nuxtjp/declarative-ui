@@ -15,7 +15,10 @@
     "README.md",
     "SECURITY.md",
     "NOTICE",
-    "LICENSE-PREVIOUS"
+    "LICENSE-PREVIOUS",
+    "README.ja.md",
+    "docs/distribution*",
+    "playground/public-api"
   ],
   "main": "./dist/module.js",
   "types": "./dist/module.d.ts",
@@ -69,6 +72,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "provenance": true
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
   }
 }

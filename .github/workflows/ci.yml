@@ -29,4 +29,11 @@ jobs:
           pnpm typecheck
           pnpm test
           pnpm build
-          npm pack --ignore-scripts
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
+          node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/nuxtjp-declarative-ui-0.10.0.tgz"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: npm-candidate
+          path: ${{ runner.temp }}/nuxtjp-declarative-ui-0.10.0.tgz
+          if-no-files-found: error
+          retention-days: 7
