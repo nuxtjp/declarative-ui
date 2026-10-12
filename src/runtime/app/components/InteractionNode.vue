@@ -4,6 +4,7 @@ import type { UiNode } from '../../shared/interaction'
 import { surfaceContext } from '../../shared/surface'
 import { installedRenderer } from '../../shared/installed'
 import { draftKey } from '../../shared/drafts'
+import { inputValue } from '../../shared/input-value'
 
 const props = defineProps<{ node: UiNode }>()
 const context = inject(surfaceContext)
@@ -19,6 +20,9 @@ const issue = computed(() => {
 const key = computed(() => draftKey(props.node.resource ?? '', props.node.operation ?? ''))
 const model = computed({get:() => context.drafts[key.value]?.[props.node.field ?? ''],
   set:(value) => { const draft = context.drafts[key.value]; if (draft && props.node.field) draft[props.node.field] = value ?? null }})
+const textModel = computed({ get: () => inputValue('string', model.value), set: (value: string | undefined) => { model.value = value ?? null } })
+const numberModel = computed({ get: () => inputValue('number', model.value), set: (value: number | undefined) => { model.value = value ?? null } })
+const booleanModel = computed({ get: () => inputValue('boolean', model.value), set: (value: boolean | undefined) => { model.value = value ?? null } })
 const display = computed(() => {
   const value = resource.value?.value
   return props.node.field && value && typeof value === 'object' && !Array.isArray(value) ? value[props.node.field] : value
@@ -39,10 +43,10 @@ const columns = computed(() => (props.node.fields ?? []).map(field => ({accessor
       <span v-if="node.label">{{ node.label }}: </span><span>{{ typeof display === 'object' ? JSON.stringify(display) : String(display ?? '') }}</span>
     </template>
     <UFormField v-else-if="node.kind === 'input'" :label="node.label" :name="node.field" :error="issue">
-      <USwitch v-if="field?.type === 'boolean'" v-model="model" :disabled="context.busy.value" />
-      <USelect v-else-if="field?.type === 'string' && field.choices?.length" v-model="model" :items="field.choices" :disabled="context.busy.value" />
-      <UInputNumber v-else-if="field?.type === 'integer' || field?.type === 'number'" v-model="model" :min="field.minimum" :max="field.maximum" :disabled="context.busy.value" />
-      <UInput v-else-if="field?.type === 'string'" v-model="model" :maxlength="field.max_length" :disabled="context.busy.value" />
+      <USwitch v-if="field?.type === 'boolean'" v-model="booleanModel" :disabled="context.busy.value" />
+      <USelect v-else-if="field?.type === 'string' && field.choices?.length" v-model="textModel" :items="field.choices" :disabled="context.busy.value" />
+      <UInputNumber v-else-if="field?.type === 'integer' || field?.type === 'number'" v-model="numberModel" :min="field.minimum" :max="field.maximum" :disabled="context.busy.value" />
+      <UInput v-else-if="field?.type === 'string'" v-model="textModel" :maxlength="field.max_length" :disabled="context.busy.value" />
       <UAlert v-else color="warning" title="Input capability unavailable" />
     </UFormField>
     <UTable v-else-if="node.kind === 'collection'" :data="rows" :columns="columns" />
