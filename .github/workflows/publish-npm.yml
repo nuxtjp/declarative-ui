@@ -98,6 +98,6 @@ jobs:
           [[ "$EXPECTED_ARCHIVE" =~ ^[a-f0-9]{64}$ ]]
           ARCHIVE="$RUNNER_TEMP/reviewed-ui/nuxtjp-declarative-ui-0.10.0.tgz"
           printf '%s  %s\n' "$EXPECTED_ARCHIVE" "$ARCHIVE" | sha256sum --check
-          tar -xOf "$ARCHIVE" package/package.json | node --input-type=module -e 'let data="";for await(const part of process.stdin)data+=part;const p=JSON.parse(data);if(p.name!=="@nuxtjp/declarative-ui"||p.version!=="0.10.0"||p.private===true||p.publishConfig?.access!=="public")throw Error("Archive identity mismatch")'
+          tar -xOf "$ARCHIVE" package/package.json | node --input-type=module -e 'let data="";for await(const part of process.stdin)data+=part;const p=JSON.parse(data);if(p.name!=="@nuxtjp/declarative-ui"||p.version!=="0.10.0"||p.private===true||p.publishConfig?.access!=="public"||p.repository?.url!=="git+https://github.com/nuxtjp/declarative-ui.git")throw Error("Archive identity mismatch")'
           npm stage publish "$ARCHIVE" --access public --provenance --ignore-scripts
           printf '%s\n' 'Staged only. The owner must approve the exact npm stage with 2FA.' >> "$GITHUB_STEP_SUMMARY"
