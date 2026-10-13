@@ -1,0 +1,226 @@
+{
+  "repository": "nuxtjp/declarative-ui",
+  "purpose": "Render declared interfaces and expose typed interaction/owner-input state in Nuxt.",
+  "responsibility_boundary": "The consuming application owns authorization, persistence, actual execution and production hosting.",
+  "packages": [
+    {
+      "manifest": "package.json",
+      "package": "@nuxtjp/declarative-ui",
+      "ecosystem": "npm",
+      "description": "Product-independent declarative interaction and exact Nuxt SSR snapshots",
+      "interfaces": {
+        "exports": {
+          ".": {
+            "types": "./dist/module.d.ts",
+            "import": "./dist/module.js"
+          },
+          "./interaction": {
+            "types": "./dist/runtime/shared/interaction.d.ts",
+            "import": "./dist/runtime/shared/interaction.js"
+          },
+          "./owner-input": "./dist/runtime/app/components/OwnerInput.vue"
+        },
+        "bin": {},
+        "main": "./dist/module.js",
+        "types": "./dist/module.d.ts"
+      },
+      "declared_commands": {
+        "build": "node scripts/build.mjs",
+        "typecheck": "vue-tsc --noEmit --project tsconfig.json",
+        "test": "vitest run && pnpm run test:dependency-security",
+        "prepack": "pnpm run test && pnpm run typecheck && pnpm run build",
+        "test:dependency-security": "node --test scripts/dependency-security.check.cjs"
+      }
+    }
+  ],
+  "schema_definitions": [],
+  "test_sources": [
+    "src/runtime/shared/drafts.ts",
+    "src/runtime/shared/interaction.ts",
+    "test/drafts.test.ts",
+    "test/input-value.test.ts",
+    "test/interaction.test.ts",
+    "test/owner-input.test.ts"
+  ],
+  "example_sources": [
+    "playground/public-api/demo.mjs"
+  ],
+  "workflow_definitions": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "jobs": [
+        {
+          "job": "test",
+          "condition": null,
+          "runs_on": "ubuntu-24.04",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "condition": null
+            },
+            {
+              "name": "Install declared package manager",
+              "run": "npm install --global pnpm@10.29.3 --ignore-scripts",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Validate independent registry dependencies and module",
+              "run": "pnpm install --frozen-lockfile --ignore-scripts\npnpm typecheck\npnpm test\npnpm build\nnpm pack --ignore-scripts --pack-destination \"$RUNNER_TEMP\"\nnode .github/scripts/package-consumer.mjs \"$RUNNER_TEMP/nuxtjp-declarative-ui-0.10.0.tgz\"\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/oss-policy.yml",
+      "jobs": [
+        {
+          "job": "repository-policy",
+          "condition": null,
+          "runs_on": "ubuntu-latest",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": "Verify repository policy",
+              "run": "python3 .github/oss-policy-check.py",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Verify policy regression tests",
+              "run": "cd .github && python3 -m unittest discover -s policy-tests",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Check policy types",
+              "run": "python3 -m venv \"$RUNNER_TEMP/policy-types\"\n\"$RUNNER_TEMP/policy-types/bin/pip\" install -r .github/policy/requirements.txt\n\"$RUNNER_TEMP/policy-types/bin/mypy\" --strict .github/policy .github/oss-policy-check.py .github/policy-tests\n",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/publish-npm.yml",
+      "jobs": [
+        {
+          "job": "prepare",
+          "condition": "github.ref == 'refs/heads/main' && github.event.repository.private == false",
+          "runs_on": "ubuntu-24.04",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": "Require reviewed main source without publication identity",
+              "run": "[[ \"$EXPECTED_SHA\" =~ ^[a-f0-9]{40}$ && \"$EXPECTED_SHA\" == \"$GITHUB_SHA\" && \"$EXPECTED_SHA\" == \"$APPROVED_SHA\" ]]\ntest -z \"$ACTIONS_ID_TOKEN_REQUEST_TOKEN\"\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": "npm install --global npm@12.2.0 pnpm@10.29.3 --ignore-scripts",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Build and validate exact candidate without publishing credentials",
+              "run": "pnpm install --frozen-lockfile --ignore-scripts\npnpm test\npnpm typecheck\npnpm build\nnpm pack --ignore-scripts --pack-destination \"$RUNNER_TEMP\"\nnode .github/scripts/package-consumer.mjs \"$RUNNER_TEMP/nuxtjp-declarative-ui-0.10.0.tgz\"\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Verify owner-reviewed archive before uploading",
+              "run": "[[ \"$EXPECTED_ARCHIVE\" =~ ^[a-f0-9]{64}$ ]]\nprintf '%s  %s\\n' \"$EXPECTED_ARCHIVE\" \"$RUNNER_TEMP/nuxtjp-declarative-ui-0.10.0.tgz\" | sha256sum --check\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "condition": null
+            }
+          ]
+        },
+        {
+          "job": "stage",
+          "condition": null,
+          "runs_on": "ubuntu-24.04",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": "Recheck approved source and OIDC identity",
+              "run": "[[ \"$EXPECTED_SHA\" =~ ^[a-f0-9]{40}$ && \"$EXPECTED_SHA\" == \"$GITHUB_SHA\" && \"$EXPECTED_SHA\" == \"$APPROVED_SHA\" ]]\ntest -n \"$ACTIONS_ID_TOKEN_REQUEST_URL\"\ntest -n \"$ACTIONS_ID_TOKEN_REQUEST_TOKEN\"\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": "npm install --global npm@12.2.0 --ignore-scripts",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "condition": null
+            },
+            {
+              "name": "Stage only the already verified archive",
+              "run": "[[ \"$EXPECTED_ARCHIVE\" =~ ^[a-f0-9]{64}$ ]]\nARCHIVE=\"$RUNNER_TEMP/reviewed-ui/nuxtjp-declarative-ui-0.10.0.tgz\"\nprintf '%s  %s\\n' \"$EXPECTED_ARCHIVE\" \"$ARCHIVE\" | sha256sum --check\ntar -xOf \"$ARCHIVE\" package/package.json | node --input-type=module -e 'let data=\"\";for await(const part of process.stdin)data+=part;const p=JSON.parse(data);if(p.name!==\"@nuxtjp/declarative-ui\"||p.version!==\"0.10.0\"||p.private===true||p.publishConfig?.access!==\"public\"||p.repository?.url!==\"git+https://github.com/nuxtjp/declarative-ui.git\")throw Error(\"Archive identity mismatch\")'\nnpm stage publish \"$ARCHIVE\" --access public --provenance --ignore-scripts\nprintf '%s\\n' 'Staged only. The owner must approve the exact npm stage with 2FA.' >> \"$GITHUB_STEP_SUMMARY\"\n",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evidence_policy": "Declarations and source paths are not proof of an executed acceptance. Exact CI head and result are recorded separately. No live accounts or production acceptance is inferred."
+}
