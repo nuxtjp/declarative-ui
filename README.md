@@ -62,3 +62,5 @@ is a value rather than absence.
 ## Public distribution candidate
 
 [Owner candidate/initial registration/OIDC stage runbook](docs/distribution.md) · [Public API playground](playground/public-api/demo.mjs). The owner CI installs the actual TGZ in an isolated consumer and checks public types, refusal and component SSR.
+
+[OSS responsibility and source completion](docs/oss-source-contract.md) defines the supported package boundary and required acceptance. It does not declare unexecuted source, distribution or production checks complete.
