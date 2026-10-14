@@ -33,7 +33,7 @@ jobs:
           pnpm build
           npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
           node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/${PACKAGE_ARCHIVE_NUXTJP_DECLARATIVE_UI_NPM}"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: npm-candidate
           path: ${{ runner.temp }}/${{ env.PACKAGE_ARCHIVE_NUXTJP_DECLARATIVE_UI_NPM }}
