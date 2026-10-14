@@ -17,7 +17,7 @@ Package distribution is not activated by this documentation. Use the checked-in 
 
 ## Getting started
 
-The transport and interaction contracts use the published npm versions `@crowsi/interaction-transport@0.10.0` and `@zixcel/interaction@0.10.0`. No private registry or local TGZ is required for these dependencies. This UI package itself has not yet been published; build the source for development and fixture verification.
+The transport and interaction contracts use the published npm versions `@crowsi/interaction-transport` and `@zixcel/interaction`. No private registry or local TGZ is required for these dependencies. This UI package itself has not yet been published; build the source for development and fixture verification.
 
 Use `pnpm@10.29.3` and the Node.js version declared in `engines` in `package.json`. Run from this repository:
 
@@ -64,3 +64,6 @@ is a value rather than absence.
 [Owner candidate/initial registration/OIDC stage runbook](docs/distribution.md) · [Public API playground](playground/public-api/demo.mjs). The owner CI installs the actual TGZ in an isolated consumer and checks public types, refusal and component SSR.
 
 [OSS responsibility and source completion](docs/oss-source-contract.md) defines the supported package boundary and required acceptance. It does not declare unexecuted source, distribution or production checks complete.
+
+Dependency updates: [repository policy](docs/dependency-updates.md).
+Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).

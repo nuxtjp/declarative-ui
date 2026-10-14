@@ -16,3 +16,6 @@
 
 
 公開配布は候補段階です。[配布手順](docs/distribution.ja.md)と[public API例](playground/public-api/demo.mjs)を参照してください。source/候補確認・初回登録・Trusted Publisher設定・npm stage承認が必要で、CIを公開済みとしません。
+
+Dependency updates: [repository policy](docs/dependency-updates.md).
+Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).
