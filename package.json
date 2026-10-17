@@ -18,7 +18,8 @@
     "LICENSE-PREVIOUS",
     "README.ja.md",
     "docs/distribution*",
-    "playground/public-api"
+    "playground/public-api",
+    "third-party"
   ],
   "main": "./dist/module.js",
   "types": "./dist/module.d.ts",
