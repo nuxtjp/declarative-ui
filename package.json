@@ -79,5 +79,12 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nuxtjp/declarative-ui.git"
-  }
+  },
+  "keywords": [
+    "nuxt",
+    "vue",
+    "declarative-ui",
+    "state-management",
+    "typescript"
+  ]
 }
