@@ -14,8 +14,8 @@ function run(args) { try { return execFileSync(args[0],args.slice(1),{cwd:projec
 let server
 try {
  writeFileSync(env.NPM_CONFIG_USERCONFIG,'');writeFileSync(env.NPM_CONFIG_GLOBALCONFIG,'')
- writeFileSync(join(project,'package.json'),JSON.stringify({private:true,type:'module',packageManager:'pnpm@10.29.3',dependencies:{
- 'simple-git':'4.0.2','@nuxtjp/declarative-ui':`file:${archive}`,'@nuxtjp/localized-site':'0.1.4',nuxt:'4.6.0',vue:'3.5.43','@nuxt/ui':'4.11.3',typescript:'5.9.3','vue-tsc':'3.2.8'}}))
+ writeFileSync(join(project,'package.json'),JSON.stringify({private:true,type:'module',packageManager:'pnpm@10.29.3',pnpm:{overrides:{'@nuxtjp/dependency-security':'0.2.2'}},dependencies:{
+ 'simple-git':'4.0.2','@nuxtjp/declarative-ui':`file:${archive}`,'@nuxtjp/localized-site':'0.5.1',nuxt:'4.6.0',vue:'3.5.43','@nuxt/ui':'4.11.3',typescript:'5.9.3','vue-tsc':'3.2.8'}}))
  run([...pm,'install','--ignore-scripts'])
  // Reuse the managed Nuxt dependency-security setup as development tooling.
  // Explicit Git fixture exercises its ESM backport even when current devtools
